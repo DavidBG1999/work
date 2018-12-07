@@ -1,0 +1,216 @@
+#include <iostream>
+#include <clocale>
+
+class Linkedlist {										
+														
+private:												
+	struct node {									
+		int value = NULL;								
+		node*prev = nullptr;				
+		node*next = nullptr;					
+	};													
+	unsigned int count;					
+	node* source;											
+	node* top;											
+	bool is_empty();
+public:
+	Linkedlist() :source(nullptr), top(nullptr), count(0) {}
+	~Linkedlist() {}
+	int* PopTop();
+	int* PopSource();
+	void PushTop(int item);
+	void PushSource(int item);
+	void reverse();
+	void erase(int pos);
+	void changeEl(int item, int pos);
+	void insert(int item, int pos);
+	void printlist();
+}; 
+
+inline void Linkedlist::PushTop(int number) {
+	node*tmp = new node();
+	tmp->next = nullptr;
+	tmp->value = number;
+	if (source != nullptr){
+		tmp->prev = top;
+		top->next = tmp;
+		top = tmp; 
+		count++;
+	}
+	else { 
+		tmp->prev = nullptr; 
+		source = tmp;
+		top = tmp;
+		count++;
+	}
+}
+
+inline void Linkedlist::PushSource(int item) {
+	node*tmp = new node();
+	tmp->prev = nullptr;
+	tmp->value = item;
+	if (source != nullptr) {
+		tmp->next = source;
+		source->prev = tmp;
+		source = tmp;
+		count++;
+	}
+	else {
+		tmp->next = nullptr;
+		source = tmp;
+		top = tmp;
+		count++;
+	};
+}
+
+inline int* Linkedlist::PopTop() {
+	if (!is_empty()) {
+		int* tmp_val = new int(top->value);
+		node* tmp_top(top);
+		top = top->prev;
+		delete tmp_top;
+		count--;
+		return tmp_val;
+	}
+	return nullptr;
+}
+
+inline int*	Linkedlist::PopSource() {
+	if (!is_empty()) {
+		int* tmp_val = new int(source->value);
+		node* tmp_source = source;
+		source = source->next;
+		delete tmp_source;
+		count--;
+		return tmp_val;
+	}
+}
+
+inline bool Linkedlist::is_empty() {
+	return !source;
+}
+
+inline void Linkedlist::reverse() {
+	node *iter = source;
+	node *temp = NULL;
+
+	while (iter != NULL)
+	{
+		temp = iter->prev;
+		iter->prev = iter->next;
+		iter->next = temp;
+		iter = iter->prev;
+	}
+	temp = source;
+	source = top;
+	top = temp;
+}
+
+inline void Linkedlist::erase(int pos) {
+	node* tmp_top(top);
+	int tmp_count(count);
+	if (pos > tmp_count) { std::cout << "Ошибка" << std::endl; }
+	else {
+		if (tmp_count == pos) { 
+			PopTop(); 
+		}
+		if (tmp_count == 1) {
+			PopSource(); 
+		}
+		if (!is_empty()) {
+			while (pos < tmp_count) {
+				tmp_top = tmp_top->prev;
+				tmp_count--;
+			}
+			node* beforeDel = tmp_top->prev;
+			node* afterDel = tmp_top->next;
+			beforeDel->next = afterDel;
+			afterDel->prev = beforeDel;
+			count--;
+			delete tmp_top;
+		}
+	}
+}
+
+inline void Linkedlist::changeEl(int item, int pos) {
+	node* tmp(top);
+	int tmp_c(count);
+	if (pos > tmp_c) { std::cout << "Ошибка" << std::endl; }
+	else {
+		if (pos == tmp_c) {
+			top->value = item; 
+		}
+		if (pos == 0) { 
+			source->value = item;
+		}
+		if (pos < tmp_c) {
+			while (pos < tmp_c) {
+				tmp = tmp->prev;
+				tmp_c--;
+			}
+			tmp->value = item;
+		}
+	}
+}
+
+inline void Linkedlist::insert(int item, int pos) {
+	node* tmp_1 = top;
+	int tmp_c = count;
+	if (pos == tmp_c) { 
+		PushTop(item); 
+	}
+	if (pos == 1) {
+		PushSource(item); 
+	}
+	if (pos > tmp_c) { 
+		std::cout << "Ошибка" << std::endl;
+	}
+	else {
+		if (pos < tmp_c) {
+			while (pos < tmp_c) {
+				tmp_1 = tmp_1->prev;
+				tmp_c--;
+			}
+			node* prevIns = tmp_1->prev;
+			node* tmp_2 = new node();
+			tmp_2->value = item;
+			tmp_2->next = tmp_1;
+			tmp_2->prev = prevIns;
+			tmp_1->prev = tmp_2;
+			count++;
+		}
+	}
+}
+
+inline void Linkedlist::printlist() {
+	node* tmp_top(top);
+	int tmp_count(count-1);
+	std::cout << top->value;
+	while (tmp_count != 0)
+	{
+		tmp_top = tmp_top->prev;
+		if (tmp_top == nullptr) 
+			break;
+		std::cout << std::endl;
+		std::cout << tmp_top->value;
+		tmp_count--;
+	}
+}
+
+int main() {
+	setlocale(LC_ALL,"Russian");
+	Linkedlist list;
+
+	list.PushTop(12);
+	list.PushTop(51);
+	list.PushTop(111);
+	list.PushTop(221);
+	list.PushTop(331);
+	list.PopTop();
+	list.changeEl(3, 3);
+
+	
+	list.printlist();
+
+	return 0;
+}
