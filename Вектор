@@ -1,0 +1,162 @@
+#include <iostream>  
+#include <string>
+#include <list>
+
+using std::cout; //объявляется  простанство имён
+using std::cin;
+using std::endl;
+using std::list;
+class Complex { 
+private:
+	double re;
+	double im;
+
+public: //методы,переменые  
+	Complex(double re1, double im1) {  // конструктор 
+  
+		re = re1; 
+		im = im1;
+	}
+	~Complex() {} //диструктор 
+
+	void setRe(double real) {   //назначает число 
+		re = real;
+	}
+	void setIm(double imag) {  //назначает чилсо 
+		im = imag;
+	}
+
+	void add(Complex number) {  //сложение 
+		re += number.re;
+		im += number.im;
+	}
+
+	void multiply(Complex number) {  //void функция ничего не возвращает (но это не функция ) 
+		Complex c(0, 0);
+		//re = (re* (number.re) - im*(number.im));  //уменожение комплексных чисел 
+		//im = (re*(number.im) + im*(number.re));
+		c.re = (re* (number.re) - im*(number.im));
+		c.im = (re*(number.im) + im*(number.re));
+		re = c.re;
+		im = c.im;
+	}
+
+	double abs() {  //модуль комплексного числа 
+		return sqrt(re*re + im*im);
+	}
+
+	double getComplexRe() {  
+		return re;
+	}
+	double getComplexIm() {
+		return im;
+	}
+};
+
+
+
+class MathVector {
+private:  //нет доступа к переменым или методам класса 
+	unsigned int dim;
+	list<Complex> crd;  //Лист - структура данных  
+	void resize(unsigned int size);  // определение функции 
+	unsigned int getDim();
+public:
+
+	MathVector::MathVector(int dim) {
+		resize(dim);// меняет размер 
+	}
+	~MathVector() {}
+	Complex abs();
+	void add(MathVector&);
+	Complex MathVector::scal(MathVector&);
+
+
+};
+
+void MathVector::resize(unsigned int size) {
+	crd.resize(size);
+	dim = size;
+}
+unsigned int MathVector::getDim() {
+	return dim;
+}
+MathVector::MathVector(int dimm) {
+	resize(dimm);
+}
+
+Complex MathVector::abs() {
+	Complex result(0, 0);
+	Complex square(0, 0);
+	list<Complex>::iterator it;
+	for (it = crd.begin(); it != crd.end(); it++)
+	{
+		square.setIm(0);
+		square.setRe(0);
+		square = (*it);
+		square.multiply(square);
+		result.add(square);
+	}
+	return result;
+}
+
+void MathVector::add(MathVector& item) {
+	list<Complex>::iterator it;
+	list<Complex>::iterator it2;
+	if (dim == item.getDim()) {
+		for (it = crd.begin(), it2 = item.crd.begin(); it != crd.end(); it++, it2++) {
+			it->add((*it2));
+		}
+	}
+	if (crd.size() > item.crd.size()) {
+		Complex temp(0, 0);
+		while (dim != item.getDim()) {
+			item.crd.push_back(temp);
+		}
+		item.resize(crd.size());
+		add(item);
+	}
+	if (crd.size()  < item.crd.size()) {
+		Complex temp(0, 0);
+		while (dim != item.getDim()) {
+			crd.push_back(temp);
+		}
+		resize(item.crd.size());
+		add(item);
+	}
+}
+
+Complex MathVector::scal(MathVector& item) {
+	list<Complex>::iterator it;
+	list<Complex>::iterator it2;
+	Complex result(0, 0);
+	if (dim == item.getDim()) {
+		for (it = crd.begin(), it2 = item.crd.begin(); it != crd.end(); it++, it2++) {
+			it->multiply((*it2));
+			result.add(*it);
+		}
+	}
+	if (crd.size() > item.crd.size()) {
+		Complex temp(0, 0);
+		while (dim != item.getDim()) {
+			item.crd.push_back(temp);
+		}
+		item.resize(crd.size());
+		scal(item);
+	}
+	if (crd.size()  < item.crd.size()) {
+		Complex temp(0, 0);
+		while (dim != item.getDim()) {
+			crd.push_back(temp);
+		}
+		resize(item.crd.size());
+		scal(item);
+	}
+	return result;
+}
+
+int main() {
+
+
+	return 0;
+}
